@@ -1,4 +1,6 @@
- {% load static %}
+{% load widget_tweaks %}
+{% load static %}
+{% include 'base.html' %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +8,25 @@
     <title>Home</title>
 </head>
 <body>
-Hi!!
+<div>
+    <nav style="background-color: white !important;" class="navbar navbar-expand-lg navbar-light bg-light">
+        <a  class="navbar-brand nav-text" href="#">My Notes</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </nav>
+    <div class="card" style="width: 18rem; margin-top: 10px; margin-left: 10px">
+        <div class="card-body">
+            <div class="card-title-layout">
+                <h5 class="card-title">Card title</h5>
+                <i class="fa fa-thumb-tack"></i>
+            </div>
+            <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            <a href="#" class="card-link">Card link</a>
+            <a href="#" class="card-link">Another link</a>
+          </div>
+    </div>
+</div>
 </body>
 </html>
