@@ -6,26 +6,78 @@
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
+    <script>
+        var expand_tag = false;
+        var currentURL = window.location.href
+        var xhr = new XMLHttpRequest();
+
+        function expandCard() {
+            if (!expand_tag) {
+                expand_tag = true;
+                document.getElementById("title").style.display = "block"
+                document.getElementById("div-btn").style.display = "block"
+                document.getElementById("card1").classList.add('custom-card')
+            }
+        }
+
+        function pinNote(note) {
+            xhr.open("GET", currentURL + 'update/' + note, true);
+            xhr.send();
+        }
+
+        document.onclick = function(e) {
+            if(e.target.id === 'main-content') {
+                expand_tag = false;
+                document.getElementById("div-btn").style.display = "none"
+                document.getElementById("title").style.display = "none"
+                document.getElementById("card1").classList.remove('custom-card')
+            }
+        }
+
+
+    </script>
 </head>
 <body>
 <div>
-    <nav style="background-color: white !important;" class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav style="background-color: white !important; margin-bottom: 10px" class="navbar navbar-expand-lg navbar-light bg-light">
         <a  class="navbar-brand nav-text" href="#">My Notes</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
     </nav>
-    <div class="card" style="width: 18rem; margin-top: 10px; margin-left: 10px">
-        <div class="card-body">
+    <div id="main-content">
+      <div  class="card card-alignment" id="card1">
+        <div class="card-body"  style="padding: 1rem">
             <div class="card-title-layout">
-                <h5 class="card-title">Card title</h5>
-                <i class="fa fa-thumb-tack"></i>
+                <form method="post">
+                    {% csrf_token %}
+                    <div>
+                        <input style="border:none;outline: none;display: none;margin-bottom: 15px" type="text" name="title" id="title" placeholder="Title"/>
+                    </div>
+                    <div>
+                        <textarea style="border:none;outline: none; overflow-y: hidden; padding-top: 1.1em;" type="text" rows="1", cols="70" name="description" id="description" onclick="expandCard()" placeholder="Take a note"></textarea>
+                    </div>
+                    <div style="float: left;display: none" id="div-btn">
+                        <button title="Add" style="border-radius: 50%;padding: 0;position: relative;display: none}" class="btn btn-primary btn-floating" type="submit" id="btn"><i class="fa fa-plus"></i></button>
+                    </div>
+                </form>
             </div>
-            <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="card-link">Card link</a>
-            <a href="#" class="card-link">Another link</a>
           </div>
+        </div>
+      <div>
+        {% for note in notes %}
+            <div class="card" style="width: 18rem; margin-top: 10px; margin-left: 10px">
+                <div class="card-body">
+                    <div class="card-title-layout">
+                        <h5 class="card-title">{{ note.title }}</h5>
+                        <i onclick="pinNote({{ note.id }})" class="fa fa-thumb-tack"></i>
+                    </div>
+                    <p class="card-text">{{ note.description }}</p>
+                  </div>
+            </div>
+        {% endfor %}
+      </div>
+
     </div>
 </div>
 </body>
