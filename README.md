@@ -8,7 +8,7 @@ python== 3.8 or up and django==4.0.5
 
 Open terminal and enter following command
 
-git clone <repo_link> (https://github.com/kruti2107/My_Notes_Application.git)
+> git clone <repo_link> (https://github.com/kruti2107/My_Notes_Application.git)
 
 or directly download zip file from Download Zip option as shown in below image
 
