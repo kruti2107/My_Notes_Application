@@ -15,10 +15,12 @@ or directly download zip file from Download Zip option as shown in below image
 ![](https://github.com/kruti2107/My_Notes_Application/blob/master/images/git.png)
 
 To install the require packages, run the following command in command prompt (first move to your project directory in cmd)
-pip install --r requirement.txt
+
+## pip install --r requirement.txt
 
 To run the project on local server, enterd the following command 
-python manapy.py runserver
+## python manapy.py runserver
+
 This will run your project on ip  http://127.0.0.1:8000 in your server
 
 # Project UI Screenshots
