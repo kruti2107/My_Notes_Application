@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from .models import *
 from My_Notes.serializer import RegistrationSerializer, NotesSerializer
 
-
+# function to handle user login
 def login(request):
     if request.method == "POST":
         request_email = request.POST.get('email')
@@ -18,11 +18,12 @@ def login(request):
             request.session['user'] = user.id
             return response
         else:
+            # execute when useid/email and password doesn't match
             messages.info(request, 'Your Username or Password is Invalid')
             return render(request, 'login.html', context={'message': messages})
     return render(request, 'login.html')
 
-
+# function to handle user registration
 def register(request):
     serializer = RegistrationSerializer(request.POST)
     if request.method == 'POST':
@@ -34,13 +35,13 @@ def register(request):
             print(serializer.errors.as_data())
     return render(request, 'registration.html', context={'form': serializer})
 
-
+# function to handle creation and retrieval of note list of user
 def home(request):
     if request.session.get('user'):
+        # execute when request for new notes creation comes
         note_list = Note.objects.filter(user_id=request.session.get('user'))
         if request.method == 'POST':
             serializer = NotesSerializer(request.POST)
-            print('POST!@#$%')
             serializer = NotesSerializer(request.POST)
             if serializer.is_valid():
                 serializer.instance.user = User.objects.get(id=request.session.get('user'))
@@ -48,13 +49,14 @@ def home(request):
                 serializer = NotesSerializer()
                 return render(request, 'home.html', context={'notes': note_list})
         elif request.method == 'GET':
+            # execute when request to get notes comes
             serializer = NotesSerializer()
             note_list = Note.objects.filter(user_id=request.session.get('user'))
             return render(request, 'home.html', context={'notes': note_list})
         return render(request, 'home.html', context={'notes': note_list})
     return redirect('/')
 
-
+# function to update the edited note details in database
 def edit_notes_details(request, note_id):
     if request.method == 'GET':
         note = Note.objects.get(id=note_id)
@@ -68,15 +70,17 @@ def edit_notes_details(request, note_id):
             return redirect('/home/')
     return render(request, 'home.html')
 
-
+# function to handle make notes favourite and delete comes
 def update_notes(request, note_id):
     if request.method == 'GET':
+        # to make notes favourite/unfavourite
         note = Note.objects.get(id=note_id)
         if note:
             note.favourite = not note.favourite
             note.save()
             return redirect('/home/')
     elif request.method == 'DELETE':
+        # delete the notes
         Note.objects.get(id=note_id).delete()
         notes = Note.objects.filter(user_id=request.session.get('user'))
         note_list = Note.objects.filter(user_id=request.session.get('user'))

@@ -14,6 +14,7 @@
         let csrftoken = '{{ csrf_token }}';
 
         function expandCard() {
+            // function to expand//collapse take a note field
             if (!expand_tag) {
                 expand_tag = true;
                 document.getElementById("title").style.display = "block"
@@ -23,12 +24,14 @@
         }
 
         function pinNote(note) {
+            // function to open request to pin/unpin or to make favourite/unfavourite note
             xhr.open("GET", currentURL + 'update/' + note, true);
             xhr.send();
             window.location.reload()
         }
 
         function deleteNote(note) {
+            // function to open request to delete note
             xhr.open("DELETE", currentURL + 'update/' + note, true);
                 xhr.setRequestHeader('X-CSRFToken', csrftoken);
             xhr.send();
@@ -36,12 +39,14 @@
         }
 
         function editNoteDetails(note) {
+            // function to open request to edit note details
             xhr.open("POST", currentURL + 'edit_note/' + note, true);
             xhr.setRequestHeader('X-CSRFToken', csrftoken);
             xhr.send();
         }
 
         document.onclick = function(e) {
+            // function to collapse note field on outside click
             if(e.target.id === 'main-content') {
                 expand_tag = false;
                 document.getElementById("div-btn").style.display = "none"
@@ -51,12 +56,14 @@
         }
 
         function logout() {
+            // function to open request to logout user
             xhr.open("GET", currentURL + 'logout', true);
             xhr.send();
             window.reload();
         }
 
         function auto_height(elem) {
+            // function to manage card height based on content
             elem.style.height = "1px";
             elem.style.height = (elem.scrollHeight)+"px";
         }
