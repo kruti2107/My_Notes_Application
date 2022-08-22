@@ -6,10 +6,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
+    <script src="{% static '/scripts/script.js' %}" type="text/javascript"></script>
     <script>
-        var expand_tag = false;
-        var currentURL = window.location.href
-        var xhr = new XMLHttpRequest();
+        let expand_tag = false;
+        let currentURL = window.location.href;
+        let xhr = new XMLHttpRequest();
+        let csrftoken = '{{ csrf_token }}';
 
         function expandCard() {
             if (!expand_tag) {
@@ -23,6 +25,20 @@
         function pinNote(note) {
             xhr.open("GET", currentURL + 'update/' + note, true);
             xhr.send();
+            window.location.reload()
+        }
+
+        function deleteNote(note) {
+            xhr.open("DELETE", currentURL + 'update/' + note, true);
+                xhr.setRequestHeader('X-CSRFToken', csrftoken);
+            xhr.send();
+            window.location.reload()
+        }
+
+        function editNoteDetails(note) {
+            xhr.open("POST", currentURL + 'edit_note/' + note, true);
+            xhr.setRequestHeader('X-CSRFToken', csrftoken);
+            xhr.send();
         }
 
         document.onclick = function(e) {
@@ -34,51 +50,109 @@
             }
         }
 
+        function logout() {
+            xhr.open("GET", currentURL + 'logout', true);
+            xhr.send();
+            window.reload();
+        }
 
+        function auto_height(elem) {
+            elem.style.height = "1px";
+            elem.style.height = (elem.scrollHeight)+"px";
+        }
     </script>
 </head>
-<body>
-<div>
-    <nav style="background-color: white !important; margin-bottom: 10px" class="navbar navbar-expand-lg navbar-light bg-light">
-        <a  class="navbar-brand nav-text" href="#">My Notes</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </nav>
-    <div id="main-content">
-      <div  class="card card-alignment" id="card1">
-        <div class="card-body"  style="padding: 1rem">
-            <div class="card-title-layout">
-                <form method="post">
-                    {% csrf_token %}
-                    <div>
-                        <input style="border:none;outline: none;display: none;margin-bottom: 15px" type="text" name="title" id="title" placeholder="Title"/>
-                    </div>
-                    <div>
-                        <textarea style="border:none;outline: none; overflow-y: hidden; padding-top: 1.1em;" type="text" rows="1", cols="70" name="description" id="description" onclick="expandCard()" placeholder="Take a note"></textarea>
-                    </div>
-                    <div style="float: left;display: none" id="div-btn">
-                        <button title="Add" style="border-radius: 50%;padding: 0;position: relative;display: none}" class="btn btn-primary btn-floating" type="submit" id="btn"><i class="fa fa-plus"></i></button>
-                    </div>
-                </form>
+<body style="background-color: #8080802e">
+    <div >
+        <nav style="background-color: #45529e !important; margin-bottom: 10px" class="navbar navbar-expand-lg navbar-light bg-light">
+            <span style="color: white"  class="navbar-brand nav-text">My Notes</span>
+            <div  class=" d-flex ml-auto">
+               <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                   <li class="nav-item">
+                       <form class="ml-auto ">
+                            <a title="Sign Out" class="nav-link font-weight-bold">
+                                <button onclick="logout()" class="btn btn-link fs-6" style="margin-right: 0;padding: 0;">
+                                    <i style="font-size: 30px;color: white" class="fa fa-power-off me-2"></i>
+                                </button>
+                            </a>
+                        </form>
+                   </li>
+               </ul>
             </div>
+        </nav>
+        <div id="main-content"  >
+          <div  class="card card-alignment" id="card1" style="height: auto;">
+            <div class="card-body"  style="padding: 1rem;">
+                <div class="card-title-layout">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div>
+                            <input style="border: none;outline: none;display: none;margin-bottom: 15px;" type="text" name="title" id="title" placeholder="Title"/>
+                        </div>
+                        <div>
+                            <textarea rows="1" class="auto_height" oninput="auto_height(this)" name="description" id="description" onclick="expandCard()" placeholder="Take a note"></textarea>
+                        </div>
+                        <div style="float: left;display: none" id="div-btn">
+                            <button title="Add" style="border-radius: 50%;padding: 0;position: relative;" class="btn btn-primary btn-floating" type="submit" id="btn" onClick=window.location.reload(false)><i class="fa fa-plus"></i></button>
+                        </div>
+                    </form>
+                </div>
+              </div>
+            </div>
+          <div>
+
+          <div style="display: flex;flex-flow: row wrap; justify-content: space-around">
+                {% for note in notes %}
+                    <div class="card col-md-4" style="width: 22rem; margin-top: 10px; margin-left: 10px">
+                            <div class="card-body">
+                                <div class="card-title-layout">
+                                    <h5 class="card-title">{{ note.title }}</h5>
+                                    <div style="display: flex;flex-direction: row;">
+                                       <div class="px-2 me-0">
+                                           {% if note.favourite %}
+                                                <i onclick="pinNote({{ note.id }})" id="notepin" class="fa fa-thumb-tack fa-lg" style="color: blue;cursor: pointer;"></i>
+                                            {% endif %}
+                                           {% if not note.favourite %}
+                                                <i onclick="pinNote({{ note.id }})" id="notepin" class="fa fa-thumb-tack fa-lg" style="cursor: pointer;"></i>
+                                           {% endif %}
+                                       </div>
+                                       <div>
+                                            <i onclick="deleteNote({{ note.id }})" style="cursor: pointer" class="fa fa-trash fa-lg"></i>
+                                       </div>
+                                    </div>
+                                </div>
+                                <p data-toggle="modal"  data-id="{{note.id}}" data-whatever="{{ note }}" data-target="#exampleModalCenter-{{ note.id }}" class="card-text" style="cursor: pointer;">{{ note.description }}</p>
+                                <div class="modal fade" id="exampleModalCenter-{{ note.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                        <div class="modal-body">
+                                            <form method="POST" action="edit_note/{{ note.id }}">
+                                                {% csrf_token %}
+                                                <div class="form-group">
+                                                    {% if note.title %}
+                                                        <input name="title"   value={{ note.title }}  id="title" style="border:none;outline: none;margin-bottom: 15px">
+                                                    {% endif %}
+                                                    {% if not note.title %}
+                                                        <input name="title"   id="title" style="border:none;outline: none;margin-bottom: 15px">
+                                                    {% endif %}
+                                                </div>
+                                                <div class="form-group" >
+                                                    <textarea rows="1" class="auto_height_inner" oninput="auto_height(this)"  name="description" id="description"  placeholder="Take a note">{{ note.description }}</textarea>
+                                                </div>
+                                                <div>
+                                                    <button type="submit" onclick="editNoteDetails({{ note.id }})" class="btn" style="background-color: #45529e">Save</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                            </div>
+                          </div>
+                                </div>
+                            </div>
+                    </div>
+                {% endfor %}
+          </div>
           </div>
         </div>
-      <div>
-        {% for note in notes %}
-            <div class="card" style="width: 18rem; margin-top: 10px; margin-left: 10px">
-                <div class="card-body">
-                    <div class="card-title-layout">
-                        <h5 class="card-title">{{ note.title }}</h5>
-                        <i onclick="pinNote({{ note.id }})" class="fa fa-thumb-tack"></i>
-                    </div>
-                    <p class="card-text">{{ note.description }}</p>
-                  </div>
-            </div>
-        {% endfor %}
-      </div>
-
     </div>
-</div>
 </body>
 </html>

@@ -2,7 +2,6 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from .models import *
-# Create your views here.
 from My_Notes.serializer import RegistrationSerializer, NotesSerializer
 
 
@@ -37,25 +36,55 @@ def register(request):
 
 
 def home(request):
-    serializer = NotesSerializer(request.POST)
-    note_list = Note.objects.filter(user_id=request.session.get('user'))
-    if request.method == 'POST':
+    if request.session.get('user'):
+        note_list = Note.objects.filter(user_id=request.session.get('user'))
+        if request.method == 'POST':
+            serializer = NotesSerializer(request.POST)
+            print('POST!@#$%')
+            serializer = NotesSerializer(request.POST)
+            if serializer.is_valid():
+                serializer.instance.user = User.objects.get(id=request.session.get('user'))
+                serializer.save()
+                serializer = NotesSerializer()
+                return render(request, 'home.html', context={'notes': note_list})
+        elif request.method == 'GET':
+            serializer = NotesSerializer()
+            note_list = Note.objects.filter(user_id=request.session.get('user'))
+            return render(request, 'home.html', context={'notes': note_list})
+        return render(request, 'home.html', context={'notes': note_list})
+    return redirect('/')
+
+
+def edit_notes_details(request, note_id):
+    if request.method == 'GET':
+        note = Note.objects.get(id=note_id)
+        if note:
+            serializer = NotesSerializer()
+            return render(request, 'home.html', context={'serializer': serializer, 'note_selected': note})
+    elif request.method == 'POST':
         serializer = NotesSerializer(request.POST)
         if serializer.is_valid():
-            serializer.instance.user = User.objects.get(id=request.session.get('user'))
-            serializer.save()
-            return render(request, 'home.html')
-    elif request.method == 'GET':
-        serializer = NotesSerializer(request.POST)
-        note_list = Note.objects.filter(user_id=request.session.get('user'))
-        return render(request, 'home.html', context={'serializer': serializer, 'notes': note_list})
-    return render(request, 'home.html', context={'serializer': serializer, 'notes': note_list})
+            Note.objects.filter(id=note_id).update(title=serializer.cleaned_data['title'], description=serializer.cleaned_data['description'], favourite=serializer.cleaned_data['favourite'])
+            return redirect('/home/')
+    return render(request, 'home.html')
 
 
 def update_notes(request, note_id):
-    note = Note.objects.get(id=note_id)
-    if note:
-        note.favourite = not note.favourite
-        note.save()
-        return HttpResponseRedirect('/home')
+    if request.method == 'GET':
+        note = Note.objects.get(id=note_id)
+        if note:
+            note.favourite = not note.favourite
+            note.save()
+            return redirect('/home/')
+    elif request.method == 'DELETE':
+        Note.objects.get(id=note_id).delete()
+        notes = Note.objects.filter(user_id=request.session.get('user'))
+        note_list = Note.objects.filter(user_id=request.session.get('user'))
+        return render(request, 'home.html', context={'notes': notes})
     return render(request, 'home.html')
+
+
+# function to handle user logout
+def logout_user(request):
+    del request.session['user']
+    return redirect('/')

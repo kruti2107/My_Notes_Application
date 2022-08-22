@@ -49,3 +49,29 @@
     background-color: #ffffff;
     color: #4285f4;
 }
+
+.textarea{
+  width:600px;
+  height:50px;
+  border:1px black;
+}
+
+.auto_height {
+  width: 600px;
+    border: none;
+    outline: none;
+    overflow-y: hidden;
+
+}
+
+.auto_height_inner {
+  width: 450px;
+    border: none;
+    outline: none;
+    overflow-y: hidden;
+
+}
+
+.bg-image {
+    background-image: url("download.jfif")
+}

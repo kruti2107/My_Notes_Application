@@ -14,3 +14,6 @@ class NotesSerializer(ModelForm):
         model = Note
         fields = ['title', 'description', 'favourite']
         exclude = ['user']
+        widgets = {
+            'description': forms.Textarea()
+        }

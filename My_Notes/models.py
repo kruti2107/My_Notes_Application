@@ -1,7 +1,10 @@
+from django import forms
 from django.db import models
 
 
 # Create your models here.
+
+
 class User(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -14,8 +17,8 @@ class User(models.Model):
 
 class Note(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=200)
-    description = models.TextField()
+    title = models.CharField(max_length=200, blank=True)
+    description = models.CharField(max_length=500, blank=True)
     favourite = models.BooleanField(default=False)
 
     class Meta:
