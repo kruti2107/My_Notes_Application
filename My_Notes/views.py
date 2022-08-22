@@ -7,18 +7,18 @@ from My_Notes.serializer import RegistrationSerializer, NotesSerializer
 # function to handle user login
 def login(request):
     if request.method == "POST":
-        request_email = request.POST.get('email')
+        request_email = request.POST['email']
         request_password = request.POST.get('password')
-        user = User.objects.get(email=request_email)
-        print(request_password)
-        print(user.password)
-        if user.email == request_email and user.password == request_password:
+        print(request_email)
+        user = User.objects.filter(email=request_email)
+        if len(user) and user[0].email == request_email and user[0].password == request_password:
             response = HttpResponseRedirect('home/')
-            response.set_cookie('user', user.id, max_age=None, expires=None)
-            request.session['user'] = user.id
+            response.set_cookie('user', user[0].id, max_age=None, expires=None)
+            request.session['user'] = user[0].id
             return response
         else:
             # execute when useid/email and password doesn't match
+            print("dsfbdjfbdjf")
             messages.info(request, 'Your Username or Password is Invalid')
             return render(request, 'login.html', context={'message': messages})
     return render(request, 'login.html')
