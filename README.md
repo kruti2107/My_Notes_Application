@@ -44,4 +44,4 @@ Home page
 ![](https://github.com/kruti2107/My_Notes_Application/blob/master/images/pinned_task.png)
 
 
-                                                  # Thank you !!!!!!!!
+# Thank you !!!!!!!!
